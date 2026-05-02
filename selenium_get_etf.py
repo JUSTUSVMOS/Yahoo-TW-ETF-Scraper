@@ -24,15 +24,28 @@ def get_browser():
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--log-level=3")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver.set_page_load_timeout(30) # 設定網頁載入最長等待 30 秒
+    return driver
 
 def scrape_page(driver, url, scroll_times=10):
     print(f"正在開啟網頁: {url}")
-    driver.get(url)
-    time.sleep(5)
+    try:
+        driver.get(url)
+        time.sleep(5) # 等待初始元素載入
+    except Exception as e:
+        print(f"⚠️ 網頁載入超時或網路不穩，嘗試擷取已載入部分。")
+        
+    # 加入防錯機制的滾動
     for i in range(scroll_times):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1.2)
+        try:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(1.2)
+        except Exception:
+            print("⚠️ 滾動時發生異常，提早結束載入。")
+            break
+            
     return driver.page_source
 
 def parse_rows(html_content, mode="search"):
