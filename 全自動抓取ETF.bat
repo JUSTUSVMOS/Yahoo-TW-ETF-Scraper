@@ -4,46 +4,46 @@ chcp 65001 >nul
 title Yahoo ETF 全自動抓取工具 (含自動更新)
 
 echo ======================================================
-echo          Yahoo ETF 全自動抓取工具 (版本檢查中)
+echo          Yahoo ETF 全自動抓取工具 (系統檢查中)
 echo ======================================================
 echo.
 
-:: 1. 檢查是否有 Git 並嘗試更新程式碼
+:: 1. 檢查並更新程式碼 (Git)
 where git >nul 2>nul
 if %errorlevel% equ 0 (
     if exist ".git" (
-        echo [更新檢查] 正在檢查 GitHub 是否有新版本...
+        echo [1/3] 正在檢查版本更新...
         git fetch --quiet
         for /f %%i in ('git rev-list HEAD...origin/main --count') do set CHANGES=%%i
-        
         if not "%CHANGES%"=="0" (
-            echo [發現更新] 正在自動升級至最新版本...
+            echo [發現新版本] 正在下載更新...
             git pull origin main --quiet
-            echo [更新完成] 程式碼已成功更新。
-            echo.
         ) else (
-            echo [最新狀態] 您使用的是最新版本。
-            echo.
+            echo [版本檢查] 已是最新版本。
         )
     )
+) else (
+    echo [提示] 未安裝 Git，跳過自動更新。
 )
 
-echo 準備執行：
-echo 1. 程式將在後台自動啟動瀏覽器 (不會顯示視窗)。
-echo 2. 正在自動抓取所有 ETF 最新資料 (約 330 筆)。
-echo 3. 請稍候約 30-50 秒，完成後會自動產出 Excel 檔案。
-echo.
-echo 正在執行中，請不要關閉此視窗...
+:: 2. 自動安裝/更新必要套件 (Pip)
+echo [2/3] 正在檢查環境套件 (這可能需要一點時間)...
+python -m pip install --upgrade pip --quiet
+python -m pip install -r requirements.txt --quiet --no-warn-script-location
+echo [環境檢查] 套件已準備就緒。
+
+:: 3. 執行抓取程式
+echo [3/3] 正在啟動全自動抓取 (背景執行)...
+echo      (約需 30-50 秒，請不要關閉此視窗)
 echo.
 
-:: 2. 執行 Python Selenium 程式
 python selenium_get_etf.py
 
 if %errorlevel% neq 0 (
     color 0C
     echo.
     echo ❌ 執行過程中發生錯誤。
-    echo 請確認是否已執行：pip install selenium webdriver-manager pandas openpyxl
+    echo 請檢查網路連線或 Python 環境。
 ) else (
     color 0A
     echo.
