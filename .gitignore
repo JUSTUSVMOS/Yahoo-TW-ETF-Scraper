@@ -3,14 +3,16 @@ __pycache__/
 *.py[cod]
 *$*.py
 
-# 產出的 Excel 檔案 (排除結果)
+# 產出的 Excel 檔案
 *.xlsx
 *.xls
 ~$*.xlsx
 
-# 網頁暫存檔
+# 網頁暫存與日誌
 *.html
 *.txt
+*.log
+!requirements.txt
 
 # 環境設定
 .venv/
