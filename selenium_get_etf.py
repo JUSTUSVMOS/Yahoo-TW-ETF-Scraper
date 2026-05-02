@@ -56,7 +56,7 @@ def parse_rows(html_content, mode="search"):
     for match in matches:
         name = match.group(1).strip()
         symbol = match.group(2).strip()
-        if not re.match(r'^[A-Z0-9]+\.TW', symbol): continue
+        if not re.match(r'^[A-Za-z0-9]+\.TWO?', symbol): continue
         if any(k in name for k in ['自選股', '登入', '瀏覽']): continue
         
         start_pos = match.end()
