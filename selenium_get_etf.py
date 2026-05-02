@@ -83,6 +83,7 @@ def parse_rows(html_content, mode="search"):
         elif mode == "performance" and len(cols) >= 4:
             data_list.append({
                 '代號': symbol,
+                '股票名稱': name,
                 '1週績效(%)': clean_numeric(cols[3]) if len(cols) > 3 else None,
                 '1個月績效(%)': clean_numeric(cols[4]) if len(cols) > 4 else None
             })
@@ -104,7 +105,13 @@ def run_master_scraper():
 
         if df_all.empty: return
 
-        final_df = pd.merge(df_all, df_perf, on='代號', how='left')
+        final_df = pd.merge(df_all, df_perf, on='代號', how='outer')
+
+        # 處理 outer merge 可能造成的欄位名稱重複 (如 股票名稱_x, 股票名稱_y)
+        if '股票名稱_x' in final_df.columns and '股票名稱_y' in final_df.columns:
+            final_df['股票名稱'] = final_df['股票名稱_x'].combine_first(final_df['股票名稱_y'])
+            final_df = final_df.drop(columns=['股票名稱_x', '股票名稱_y'])
+
 
         # --- 自動排序：先按 1週績效 降序，再按 年初至今 降序 ---
         # 這樣績效好的就會在最上面
