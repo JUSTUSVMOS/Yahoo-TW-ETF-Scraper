@@ -1,0 +1,18 @@
+# Python 暫存
+__pycache__/
+*.py[cod]
+*$*.py
+
+# 產出的 Excel 檔案 (排除結果)
+*.xlsx
+*.xls
+~$*.xlsx
+
+# 網頁暫存檔
+*.html
+*.txt
+
+# 環境設定
+.venv/
+venv/
+.env
